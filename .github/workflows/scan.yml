@@ -1,0 +1,26 @@
+name: Automated Nmap Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"  # every Sunday at midnight
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Nmap
+        run: sudo apt-get update && sudo apt-get install -y nmap
+
+      - name: Run Python Scanner
+        run: python scanner.py
+
+      - name: Upload Scan Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: scan-report
+          path: scan_report_*.txt
