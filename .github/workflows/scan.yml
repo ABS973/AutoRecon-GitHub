@@ -13,14 +13,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
       - name: Install Nmap
-        run: sudo apt-get update && sudo apt-get install -y nmap
+        run: sudo apt-get update --allow-releaseinfo-change && sudo apt-get install -y nmap
 
-      - name: Run Python Scanner
-        run: python scanner.py
+      - name: Run Scanner
+        run: python3 scanner.py -t scanme.nmap.org
 
-      - name: Upload Scan Report
+      - name: Upload Scan Reports
         uses: actions/upload-artifact@v3
         with:
-          name: scan-report
-          path: scan_report_*.txt
+          name: scan-reports
+          path: scan_report_*.{txt,html}
+
+      - name: Commit Reports (optional)
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add scan_report_*.{txt,html}
+          git commit -m "Add latest scan reports" || echo "No changes to commit"
+          git push
